@@ -11,8 +11,17 @@ class Ball{
     {
         this.g.fillStyle = 'green';
         this.g.beginPath();
-        this.g.arc(this.x,this.y,15,0,2 * Math.PI,false);
+        this.g.arc(this.x,this.y,10,0,2 * Math.PI,false);
         this.g.fill();
+		//this.g.fillStyle = 'white'
+		//this.g.fillRect(this.x + 10,this.y - 10,2,2);
+		//this.g.fillRect(this.x + 10,this.y + 10,2,2);
+		//this.g.fillRect(this.x - 10,this.y - 10,2,2);
+		//this.g.fillRect(this.x - 10,this.y + 10,2,2);
+		//this.g.fillRect(this.x - 15,this.y,2,2);
+		//this.g.fillRect(this.x + 15,this.y,2,2);
+		//this.g.fillRect(this.x,this.y - 10,2,2);
+		//this.g.fillRect(this.x,this.y + 10,2,2);
     }
 
     update(_x,_y)

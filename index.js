@@ -4,8 +4,10 @@ window.onload = ()=>{
 
     const WIDTH = 500;
     const HEIGHT = 500;
-    const FONT = '32px sans-serif';
+    const FONT_TITLE = '32px sans-serif';
+	const FONT_SCORE = '16px sans-serif';
 
+	let score;
     let startFlag;
     let ballFlag;
     let gameFlag;
@@ -31,7 +33,7 @@ window.onload = ()=>{
     const canvasConfig = ()=>{
         canvas.width = WIDTH;
         canvas.height = HEIGHT; 
-        canvas.style.background = 'black';
+		canvas.setAttribute('style','display: block; margin: auto; background: black;')
     }
 
     const clear = ()=>{
@@ -41,12 +43,38 @@ window.onload = ()=>{
     const drawTitle = ()=>{
         clear();
         g.fillStyle = 'white';
-        g.font = FONT;
+        g.font = FONT_TITLE;
         const text = 'エンターキーでスタート!';
         const textW = g.measureText( text ).width;
         g.fillText(text,( WIDTH - textW ) / 2,200,1000);
         startFlag = true;
     }
+
+	const drawScore = ()=>{
+		g.fillStyle = 'white';
+		g.font = FONT_SCORE;
+		const text = `score:${score}`;
+		g.fillText(text,50,450,50);
+	}
+
+	const drawGameClear = ()=>{
+		clear();
+		g.fillStyle = 'white';
+		g.font = FONT_TITLE;
+		const text = 'GameClear!';
+		const textW = g.measureText( text ).width;
+		g.fillText(text,( WIDTH - textW ) / 2,200,1000);
+		drawScore();
+	}
+
+	const drawGameOver = () =>{
+		clear();
+		g.fillStyle = 'white';
+		g.font = FONT_TITLE;
+		const text = 'GameOver!';
+		const textW = g.measureText( text ).width;
+		g.fillText(text,( WIDTH - textW ) / 2,200,1000);
+	}
 
     const init = ()=>{
         clear();
@@ -60,6 +88,7 @@ window.onload = ()=>{
 			}
 		}
         line.draw();
+		score = 0;
         startFlag = false;
         ballFlag = true;
     }
@@ -71,6 +100,18 @@ window.onload = ()=>{
 					blocks[y][x] = 0;
 				}
 			}
+		}
+	}
+
+	const judge = ()=>{
+		let clearCount = 0
+		for(let y = 0;y < blocks.length;y ++){
+			for(let x = 0;x < blocks[y].length;x ++){
+				if(blocks[y][x] == 0) clearCount ++;
+			}
+		}
+		if(clearCount == 30){
+			drawGameClear();
 		}
 	}
 
@@ -97,7 +138,7 @@ window.onload = ()=>{
             if(balls[i].x + 15 >= WIDTH) balls[i].vector_x *= -1;
             if(balls[i].y <= 0) balls[i].vector_y *= -1;
 
-            let r = 15;
+            let r = 10;
 
             if(
                 balls[i].x > line.x && balls[i].x < line.x + 50 &&
@@ -128,48 +169,21 @@ window.onload = ()=>{
 
 			for(let y = 0;y < blocks.length;y ++){
 				for(let x = 0;x < blocks[y].length;x ++){
-					if(blocks[y][x] == 0) continue;
-					if(
-						balls[i].x > blocks[y][x].x && balls[i].x < blocks[y][x].x + 50 &&
-						balls[i].y > blocks[y][x].y - r && balls[i].y < blocks[y][x].y + 30
-					){
-                        balls[i].vector_y *= -1;
-						blocks_bool[y][x] = 0;
-					}
-					if(
-						balls[i].x > blocks[y][x].x - r && balls[i].x < blocks[y][x].x + 50 + r &&
-						balls[i].y > blocks[y][x].y && balls[i].y < blocks[y][x].y + 30
-					){
-                        balls[i].vector_x *= -1;
-						blocks_bool[y][x] = 0;
-					}
 
+					let block = blocks[y][x];
+
+					if(blocks_bool == 0) continue;
+					
 					if(
-						/*左上*/Math.pow(blocks[y][x].x - balls[i].x,2) + Math.pow(blocks[y][x].y - balls[i].y,2) < Math.pow(r,2)
+						balls[i].x > block.x&&
+						balls[i].x < block.x + 45&&
+						balls[i].y > block.y&&
+						balls[i].y < block.y + 25
 					){
-                        balls[i].vector_x *= -1;
-                        balls[i].vector_y = -5;
+						balls[i].vector_y *= -1;
 						blocks_bool[y][x] = 0;
+						score += 10;
 					}
-                    if(/*右上*/Math.pow(blocks[y][x].x + 50 - balls[i].x,2) + Math.pow(blocks[y][x].y - balls[i].y,2) < Math.pow(r,2)){
-                        balls[i].vector_x *= -1;
-                        balls[i].vector_y = -5;
-                        blocks_bool[y][x] = 0;
-                    }
-                    if(
-                        /*右下*/Math.pow(blocks[y][x].x + 50 - balls[i].x,2) + Math.pow(blocks[y][x].y + 30 - balls[i].y,2) < Math.pow(r,2)
-                    ){
-                        balls[i].vector_x *= -1;
-                        balls[i].vector_y = 5;
-                        blocks_bool[y][x] = 0;
-                    }
-                    if(
-                        /*左下*/Math.pow(blocks[y][x].x - balls[i].x,2) + Math.pow(blocks[y][x].y + 30 - balls[i].y,2) < Math.pow(r,2)
-                    ){
-                        balls[i].vector_x *= -1;
-                        balls[i].vector_y = 5;
-                        blocks_bool[y][x] = 0;
-                    }
 				}
 			}
 
@@ -190,10 +204,12 @@ window.onload = ()=>{
 		}
 
 		reflect();
+		judge();
 
         line.draw();
+		drawScore();
         if(balls.length == 0){
-            drawTitle();
+            drawGameOver();
             startFlag = false;
         }
         requestAnimationFrame(main);
@@ -205,6 +221,7 @@ window.onload = ()=>{
             requestAnimationFrame(main);
         }
         keys[e.key] = true;
+		if(e.key == 'Escape') document.location.reload();
         if(e.key == 'p') balls.push(new Ball(line.x + 25,line.y - 30,g))
     }
     window.onkeyup = (e)=>{
@@ -213,5 +230,3 @@ window.onload = ()=>{
 
 
 }
-//ブロックと壁に挟まったときに出るバグ
-//角度を保持したまま抜け出したい

@@ -10,7 +10,4 @@ class Block{
 		this.g.fillRect(this.x,this.y,45,25);
 	}
 
-	update(){
-		
-	}
 }
